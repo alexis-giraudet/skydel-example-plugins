@@ -11,61 +11,10 @@ on:
 
 jobs:
   build-ubuntu:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Set environment variables
-        run: |
-          echo "ARTIFACT_NAME=skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$GITHUB_ENV"
-          echo "CMAKE_BUILD_DIR=${{ runner.temp }}/build" >> "$GITHUB_ENV"
-          echo "CMAKE_INSTALL_DIR=${{ runner.temp }}/skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$GITHUB_ENV"
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '5.15.2'
-      - name: Install dependencies
-        run: |
-          sudo apt --yes install uuid-dev
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Build
-        run: |
-          cmake -D CMAKE_BUILD_TYPE=Release -D PLUGIN_INSTALL_DIR="${CMAKE_INSTALL_DIR}" -B "${CMAKE_BUILD_DIR}" .
-          cmake --build "${CMAKE_BUILD_DIR}" --parallel "$(nproc)"
-          cmake --install "${CMAKE_BUILD_DIR}"
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.CMAKE_INSTALL_DIR }}
-          retention-days: 1
-          overwrite: true
+    uses: ./.github/workflows/build-ubuntu.yml
 
   build-windows:
-    runs-on: windows-2019
-    steps:
-      - name: Set environment variables
-        run: |
-          echo "ARTIFACT_NAME=skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$env:GITHUB_ENV"
-          echo "CMAKE_BUILD_DIR=${{ runner.temp }}/build" >> "$env:GITHUB_ENV"
-          echo "CMAKE_INSTALL_DIR=${{ runner.temp }}/skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$env:GITHUB_ENV"
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: '5.15.2'
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Build
-        run: |
-          cmake -D CMAKE_CXX_FLAGS="/bigobj" -D PLUGIN_INSTALL_DIR="$env:CMAKE_INSTALL_DIR" -B "$env:CMAKE_BUILD_DIR" .
-          cmake --build "$env:CMAKE_BUILD_DIR" --config Release --parallel "$env:NUMBER_OF_PROCESSORS"
-          cmake --install "$env:CMAKE_BUILD_DIR"
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.CMAKE_INSTALL_DIR }}
-          retention-days: 1
-          overwrite: true
+    uses: ./.github/workflows/build-windows.yml
 
   release:
     needs: [build-ubuntu, build-windows]

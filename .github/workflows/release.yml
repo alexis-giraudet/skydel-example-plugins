@@ -13,7 +13,7 @@ jobs:
   build-ubuntu:
     runs-on: ubuntu-22.04
     steps:
-      - name: Environment variables
+      - name: Set environment variables
         run: |
           echo "ARTIFACT_NAME=skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$GITHUB_ENV"
           echo "CMAKE_BUILD_DIR=${{ runner.temp }}/build" >> "$GITHUB_ENV"
@@ -47,16 +47,19 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: Set environment variables
+        run: |
+          echo "ARTIFACTS_PATH=${{ runner.temp }}/artifacts" >> "$GITHUB_ENV"
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ${{ runner.temp }}/artifacts
+          path: ${{ env.ARTIFACTS_PATH }}
       - name: Archive artifacts
         run: |
-          cd "${{ runner.temp }}/artifacts"
+          cd "${ARTIFACTS_PATH}"
           find . -mindepth 1 -maxdepth 1 -type d -exec zip -r "{}.zip" "{}" \;
-      - name: GitHub release
+      - name: Create GitHub release
         run: |
           find "${{ runner.temp }}/artifacts" -mindepth 1 -maxdepth 1 -type f -exec gh release create "${{ inputs.release_tag }}" --generate-notes "{}" +

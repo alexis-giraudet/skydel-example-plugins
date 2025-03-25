@@ -21,10 +21,7 @@ jobs:
           sudo apt --yes install uuid-dev
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Environment variables
-        run: |
-          echo "BUILD_DIR=$(mktemp --directory)" >> "$GITHUB_ENV"
       - name: Build
         run: |
-          cmake -B "$BUILD_DIR" .
-          cmake --build "$BUILD_DIR" --parallel $(nproc)
+          cmake -B build .
+          cmake --build build --parallel $(nproc)

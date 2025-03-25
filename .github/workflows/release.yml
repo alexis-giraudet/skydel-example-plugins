@@ -10,11 +10,11 @@ on:
         default: 'vXX.YY.ZZ'
 
 env:
-  ARTIFACT_UBUNTU_22: skydel-plugins-ubuntu-22
-
+  ARTIFACT_UBUNTU: skydel-example-plugins-ubuntu
+  ARTIFACT_WINDOWS: skydel-example-plugins-windows
 
 jobs:
-  build-ubuntu-22:
+  build-ubuntu:
     runs-on: ubuntu-22.04
     steps:
       - name: Install Qt
@@ -26,35 +26,36 @@ jobs:
           sudo apt --yes install uuid-dev
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Environment variables
-        run: |
-          echo "BUILD_DIR=$(mktemp --directory)" >> "$GITHUB_ENV"
-          echo "INSTALL_DIR=$(realpath ${{ env.ARTIFACT_UBUNTU_22 }})" >> "$GITHUB_ENV"
       - name: Build
         run: |
-          cmake -D PLUGIN_INSTALL_DIR="$INSTALL_DIR" -B "$BUILD_DIR" .
-          cmake --build "$BUILD_DIR" --parallel $(nproc)
-          cmake --install "$BUILD_DIR"
+          cmake -D PLUGIN_INSTALL_DIR="${{ env.RUNNER_TEMP }}/${{ env.ARTIFACT_UBUNTU }}" -B "${{ env.RUNNER_TEMP }}/build" .
+          cmake --build "${{ env.RUNNER_TEMP }}/build" --parallel $(nproc)
+          cmake --install "${{ env.RUNNER_TEMP }}/build"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_UBUNTU_22 }}
-          path: ${{ env.ARTIFACT_UBUNTU_22 }}
+          name: ${{ env.ARTIFACT_UBUNTU }}
+          path: ${{ env.RUNNER_TEMP }}/${{ env.ARTIFACT_UBUNTU }}
           retention-days: 1
           overwrite: true
 
 
   release:
-    needs: [build-ubuntu-22]
+    needs: [build-ubuntu]
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download all artifacts
+      - name: Download artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: ${{ env.RUNNER_TEMP }}/artifacts
+      - name: Archive artifacts
+        run: |
+          cd "${{ env.RUNNER_TEMP }}/artifacts"
+          find . -mindepth 1 -maxdepth 1 -type d -exec zip -r "{}.zip" "{}" \;
       - name: GitHub release
         run: |
-          find . -name "skydel-plugins-ubuntu-*" -type d -mindepth 1 -maxdepth 1 -exec zip -r "{}.zip" "{}" \;
-          find . -name "skydel-plugins-ubuntu-*" -type f -mindepth 1 -maxdepth 1 -exec gh release create "${{ inputs.release_tag }}" --generate-notes "{}" +
+          find "${{ env.RUNNER_TEMP }}/artifacts" -mindepth 1 -maxdepth 1 -type f -exec gh release create "${{ inputs.release_tag }}" --generate-notes "{}" +

@@ -45,9 +45,9 @@ jobs:
     steps:
       - name: Set environment variables
         run: |
-          echo "ARTIFACT_NAME=skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$GITHUB_ENV"
-          echo "CMAKE_BUILD_DIR=${{ runner.temp }}/build" >> "$GITHUB_ENV"
-          echo "CMAKE_INSTALL_DIR=${{ runner.temp }}/skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$GITHUB_ENV"
+          echo "ARTIFACT_NAME=skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$env:GITHUB_ENV"
+          echo "CMAKE_BUILD_DIR=${{ runner.temp }}/build" >> "$env:GITHUB_ENV"
+          echo "CMAKE_INSTALL_DIR=${{ runner.temp }}/skydel-example-plugins-${{ runner.os }}-${{ runner.arch }}" >> "$env:GITHUB_ENV"
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:

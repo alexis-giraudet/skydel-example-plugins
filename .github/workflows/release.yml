@@ -57,4 +57,4 @@ jobs:
       - name: GitHub release
         run: |
           find . -name "skydel-plugins-ubuntu-*" -type d -mindepth 1 -maxdepth 1 -exec zip -r "{}.zip" "{}" \;
-          find . -name "skydel-plugins-ubuntu-*" -type f -mindepth 1 -maxdepth 1 -exec gh release create ${{ inputs.release_name }} --generate-notes "{}" +
+          find . -name "skydel-plugins-ubuntu-*" -type f -mindepth 1 -maxdepth 1 -exec gh release create "${{ inputs.release_name }}" --generate-notes "{}" +

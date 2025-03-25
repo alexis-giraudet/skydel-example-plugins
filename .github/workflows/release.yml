@@ -28,14 +28,14 @@ jobs:
         uses: actions/checkout@v4
       - name: Build
         run: |
-          cmake -D PLUGIN_INSTALL_DIR="${{ github.temp }}/${{ env.ARTIFACT_UBUNTU }}" -B "${{ github.temp }}/build" .
-          cmake --build "${{ github.temp }}/build" --parallel $(nproc)
-          cmake --install "${{ github.temp }}/build"
+          cmake -D PLUGIN_INSTALL_DIR="${{ runner.temp }}/${{ env.ARTIFACT_UBUNTU }}" -B "${{ runner.temp }}/build" .
+          cmake --build "${{ runner.temp }}/build" --parallel $(nproc)
+          cmake --install "${{ runner.temp }}/build"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.ARTIFACT_UBUNTU }}
-          path: ${{ github.temp }}/${{ env.ARTIFACT_UBUNTU }}
+          path: ${{ runner.temp }}/${{ env.ARTIFACT_UBUNTU }}
           retention-days: 1
           overwrite: true
 
@@ -51,11 +51,11 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ${{ github.temp }}/artifacts
+          path: ${{ runner.temp }}/artifacts
       - name: Archive artifacts
         run: |
-          cd "${{ github.temp }}/artifacts"
+          cd "${{ runner.temp }}/artifacts"
           find . -mindepth 1 -maxdepth 1 -type d -exec zip -r "{}.zip" "{}" \;
       - name: GitHub release
         run: |
-          find "${{ github.temp }}/artifacts" -mindepth 1 -maxdepth 1 -type f -exec gh release create "${{ inputs.release_tag }}" --generate-notes "{}" +
+          find "${{ runner.temp }}/artifacts" -mindepth 1 -maxdepth 1 -type f -exec gh release create "${{ inputs.release_tag }}" --generate-notes "{}" +

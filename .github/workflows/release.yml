@@ -29,7 +29,7 @@ jobs:
       - name: Environment variables
         run: |
           echo "BUILD_DIR=$(mktemp --directory)" >> "$GITHUB_ENV"
-          echo "INSTALL_DIR=$(realpath ${{ ARTIFACT_UBUNTU_22 }})" >> "$GITHUB_ENV"
+          echo "INSTALL_DIR=$(realpath ${{ env.ARTIFACT_UBUNTU_22 }})" >> "$GITHUB_ENV"
       - name: Build
         run: |
           cmake -D PLUGIN_INSTALL_DIR="$INSTALL_DIR" -B "$BUILD_DIR" .
@@ -38,8 +38,8 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ ARTIFACT_UBUNTU_22 }}
-          path: ${{ ARTIFACT_UBUNTU_22 }}
+          name: ${{ env.ARTIFACT_UBUNTU_22 }}
+          path: ${{ env.ARTIFACT_UBUNTU_22 }}
           retention-days: 1
           overwrite: true
 

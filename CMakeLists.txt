@@ -23,9 +23,13 @@ set(CMAKE_INSTALL_LIBDIR .)
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
 # Skydel Plugins SDK
-add_library(SkydelPlugin INTERFACE)
-target_include_directories(SkydelPlugin INTERFACE include)
-target_link_libraries(SkydelPlugin INTERFACE Qt5::Core Qt5::Widgets)
+include(FetchContent)
+FetchContent_Declare(
+  SkydelPlugin
+  GIT_REPOSITORY https://github.com/alexis-giraudet/skydel-plug-ins.git
+  GIT_TAG        8e672f11b34e0992929379ff8a9daf104eb5ba24 # v24-12-0
+)
+FetchContent_MakeAvailable(SkydelPlugin)
 
 # Example Plugins
 add_subdirectory(source)

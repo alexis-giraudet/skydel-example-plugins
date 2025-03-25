@@ -57,9 +57,9 @@ jobs:
       - name: Build
         run: |
           mkdir build
-          cmake -D CMAKE_CXX_FLAGS="/bigobj" -D PLUGIN_INSTALL_DIR="${CMAKE_INSTALL_DIR}" -B "${CMAKE_BUILD_DIR}" .
-          cmake --build "${CMAKE_BUILD_DIR}" --parallel "$(nproc)"
-          cmake --install "${CMAKE_BUILD_DIR}"
+          cmake -D CMAKE_CXX_FLAGS="/bigobj" -D PLUGIN_INSTALL_DIR="$env:CMAKE_INSTALL_DIR" -B "$env:CMAKE_BUILD_DIR" .
+          cmake --build "$env:CMAKE_BUILD_DIR" --parallel "$env:NUMBER_OF_PROCESSORS"
+          cmake --install "$env:CMAKE_BUILD_DIR"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

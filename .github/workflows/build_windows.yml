@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Build
         run: |
-          cmake -D CMAKE_CXX_FLAGS="/bigobj" -D PLUGIN_INSTALL_DIR="$env:CMAKE_INSTALL_DIR" -B "$env:CMAKE_BUILD_DIR" .
+          cmake -D CMAKE_CXX_FLAGS="/bigobj /EHsc" -D PLUGIN_INSTALL_DIR="$env:CMAKE_INSTALL_DIR" -B "$env:CMAKE_BUILD_DIR" .
           cmake --build "$env:CMAKE_BUILD_DIR" --config Release --parallel "$env:NUMBER_OF_PROCESSORS"
           cmake --install "$env:CMAKE_BUILD_DIR"
       - name: Upload artifacts

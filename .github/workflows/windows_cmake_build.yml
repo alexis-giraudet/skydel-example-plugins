@@ -1,4 +1,4 @@
-name: Windows CMake Build
+name: Build Windows
 
 on:
   push:
@@ -8,40 +8,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: windows-latest
-
+  build-windows-2019:
+    runs-on: windows-2019
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           version: '5.15.2'
-          host: 'windows'
-          arch: 'win64_msvc2019_64'
-
-      - name: Setup Ninja
-        uses: ashutoshvarma/setup-ninja@master
-        with:
-          version: 1.10.1
-
-      - name: Build Setup
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          toolset: '14.29'
-
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v1.13
-        with:
-          cmake-version: '3.22.x'
-
-      - name: Build with CMake
-        uses: ashutoshvarma/action-cmake-build@master
-        with:
-          build-dir: ${{ runner.workspace }}/build
-          cc: cl
-          cxx: cl
-          configure-options: -G Ninja
-          build-type: Release
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: |
+          mkdir build
+          cmake -D CMAKE_CXX_FLAGS="/bigobj" -B build .
+          cmake --build build --parallel $(nproc)

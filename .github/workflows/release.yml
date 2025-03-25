@@ -59,6 +59,7 @@ jobs:
           mkdir build
           cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_CXX_FLAGS="/bigobj" -D PLUGIN_INSTALL_DIR="$env:CMAKE_INSTALL_DIR" -B "$env:CMAKE_BUILD_DIR" .
           cmake --build "$env:CMAKE_BUILD_DIR" --parallel "$env:NUMBER_OF_PROCESSORS"
+          tree "$env:CMAKE_BUILD_DIR"
           cmake --install "$env:CMAKE_BUILD_DIR"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

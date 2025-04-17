@@ -1,0 +1,35 @@
+
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-ubuntu:
+    uses: ./.github/workflows/build_ubuntu.yml
+
+  build-windows:
+    uses: ./.github/workflows/build_windows.yml
+
+  github-release:
+    needs: [build-ubuntu, build-windows]
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Set environment variables
+        run: |
+          echo "ARTIFACTS_PATH=${{ runner.temp }}/artifacts" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ env.ARTIFACTS_PATH }}
+      - name: Archive artifacts
+        run: |
+          cd "${ARTIFACTS_PATH}"
+          find . -mindepth 1 -maxdepth 1 -type d -exec zip -r "{}.zip" "{}" \;
+      - name: Upload artifacts to GitHub release
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" "${ARTIFACTS_PATH}/"*.zip
